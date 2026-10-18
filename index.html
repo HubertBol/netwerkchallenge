@@ -1,0 +1,74 @@
+
+currentQuestion++;
+
+updateProgress();
+
+if(currentQuestion <
+questions.length){
+
+renderQuestion();
+
+}else{
+
+showResult();
+
+}
+
+}
+
+function showResult(){
+
+let level="";
+let code="";
+
+if(score>=18){
+
+level =
+"<div class='badge' style='background:#16a34a'>🏆 Expert Netwerkbeheerder</div>";
+
+code =
+"<p><strong>Escape Code:</strong> 62-127-30</p>";
+
+}else if(score>=15){
+
+level =
+"<div class='badge' style='background:#2563eb'>✅ Gevorderd</div>";
+
+}else if(score>=10){
+
+level =
+"<div class='badge' style='background:#f59e0b'>⚡ Junior Engineer</div>";
+
+}else{
+
+level =
+"<div class='badge' style='background:#dc2626'>📚 Nog oefenen</div>";
+
+}
+
+document.getElementById("quizContainer")
+.innerHTML="";
+
+document.getElementById("counter")
+.innerHTML="<h2>🎉 Quiz voltooid!</h2>";
+
+document.getElementById("nextBtn")
+.style.display="none";
+
+document.getElementById("result")
+.innerHTML=
+`
+<h2>Score: ${score}/20</h2>
+${level}
+<br><br>
+${code}
+`;
+
+}
+
+renderQuestion();
+
+</script>
+
+</body>
+</html>
