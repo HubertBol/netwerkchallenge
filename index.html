@@ -1,21 +1,16 @@
-.querySelectorAll(".answer");
 
-options.forEach(opt=>{
-opt.style.pointerEvents="none";
-});
+currentQuestion++;
 
-if(a === questions[q].c){
+updateProgress();
 
-element.classList.add("correct");
-score++;
+if(currentQuestion <
+questions.length){
+
+renderQuestion();
 
 }else{
 
-element.classList.add("wrong");
-
-options[
-questions[q].c
-].classList.add("correct");
+showResult();
 
 }
 
@@ -23,50 +18,55 @@ questions[q].c
 
 function showResult(){
 
-let text="";
-let badge="";
+let level="";
+let code="";
 
-if(score>=9){
+if(score>=18){
 
-badge =
-"<div class='badge' style='background:#22c55e'>🏆 Expert</div>";
+level =
+"<div class='badge' style='background:#16a34a'>🏆 Expert Netwerkbeheerder</div>";
 
-text=
-"Escape Code: 62-30-65";
+code =
+"<p><strong>Escape Code:</strong> 62-127-30</p>";
 
-}
+}else if(score>=15){
 
-else if(score>=7){
+level =
+"<div class='badge' style='background:#2563eb'>✅ Gevorderd</div>";
 
-badge=
-"<div class='badge' style='background:#3b82f6'>✅ Gevorderd</div>";
+}else if(score>=10){
 
-text=
-"Goed gedaan!";
+level =
+"<div class='badge' style='background:#f59e0b'>⚡ Junior Engineer</div>";
 
-}
+}else{
 
-else{
-
-badge=
-"<div class='badge' style='background:#ef4444'>📚 Beginner</div>";
-
-text=
-"Nog even oefenen.";
+level =
+"<div class='badge' style='background:#dc2626'>📚 Nog oefenen</div>";
 
 }
+
+document.getElementById("quizContainer")
+.innerHTML="";
+
+document.getElementById("counter")
+.innerHTML="<h2>🎉 Quiz voltooid!</h2>";
+
+document.getElementById("nextBtn")
+.style.display="none";
 
 document.getElementById("result")
 .innerHTML=
 `
-Score: ${score}/${questions.length}
+<h2>Score: ${score}/20</h2>
+${level}
 <br><br>
-${badge}
-<br><br>
-${text}
+${code}
 `;
 
 }
+
+renderQuestion();
 
 </script>
 
