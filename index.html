@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Netwerkinfrastructuur Quiz</title>
+
+<style>
+
+body{
+    font-family:Segoe UI, Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+}
+
+header{
+    background:#2563eb;
+    text-align:center;
+    padding:40px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.progress{
+    width:100%;
+    height:20px;
+    background:#334155;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:#22c55e;
+    transition:.5s;
+}
+
+.answer{
+    background:#334155;
+    padding:14px;
+    margin:10px 0;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.answer:hover{
+    background:#475569;
+}
+
+.correct{
+    background:#16a34a !important;
+}
+
+.wrong{
+    background:#dc2626 !important;
+}
+
+.feedback{
+    margin-top:15px;
+    padding:15px;
+    background:#475569;
+    border-radius:8px;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+#nextBtn{
+    display:none;
+}
+
+</style>
+
+</head>
+<body>
+
+<header>
+<h1>💻 Netwerkinfrastructuur Challenge</h1>
+<p>TCP/IP • Subnetting • VLAN's • Inter-VLAN Routing</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Voortgang</h2>
+
+<div class="progress">
+    <div id="progressFill"
+         class="progress-fill">
+    </div>
+</div>
+
+<p id="counter"></p>
+
+</div>
+
+<div class="card">
+
+<div id="quiz"></div>
+
+<button id="nextBtn"
+        onclick="nextQuestion()">
+
+Volgende vraag →
+
+</button>
+
+<div id="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+q:"Wat is het doel van een IP-adres?",
+a:[
+"Een apparaat identificeren",
+"Een VLAN maken",
+"Een switch resetten",
+"Een kabel testen"
+],
+c:0,
+f:"✅ Correct! Een IP-adres identificeert een apparaat op een netwerk."
+},
+
+{
+q:"Hoeveel bits heeft een IPv4-adres?",
+a:[
+"16",
+"32",
+"64",
+"128"
+],
+c:1,
+f:"✅ Correct! IPv4 bestaat uit 32 bits."
+},
+
+{
+q:"Welke klasse begint meestal met 192?",
+a:[
+"A",
+"B",
+"C",
+"D"
+],
+c:2,
+f:"✅ Correct! Klasse C loopt van 192 t/m 223."
+},
+
+{
+q:"Hoeveel bruikbare hosts heeft een /26 subnet?",
+a:[
+"30",
+"62",
+"126",
+"254"
+],
+c:1,
+f:"✅ Correct! Een /26 bevat 64 adressen waarvan er 62 bruikbaar zijn."
+},
+
+{
+q:"Wat is het subnetmasker van /27?",
+a:[
+"255.255.255.224",
+"255.255.255.192",
+"255.255.255.240",
+"255.255.255.0"
+],
+c:0,
+f:"✅ Correct! /27 = 255.255.255.224."
+},
+
+{
+q:"Waarvoor gebruik je een default gateway?",
+a:[
+"Naar andere netwerken",
+"Voor DHCP",
+"Voor DNS",
+"Voor printers"
+],
+c:0,
+f:"✅ Correct! Via de gateway bereik je andere netwerken."
+},
+
+{
+q:"Wat doet een VLAN?",
+a:[
+"Meer snelheid",
+"Logische scheiding van een netwerk",
+"Meer geheugen",
+"DNS vervangen"
+],
+c:1,
+f:"✅ Correct! VLAN's delen een netwerk logisch op."
+},
+
+{
+q:"Welke poort gebruik je voor een pc?",
+a:[
+"Access",
+"Trunk",
+"Console",
+"WAN"
+],
+c:0,
+f:"✅ Correct! Een pc wordt aangesloten op een access-poort."
+},
+
+{
+q:"Welke poort transporteert meerdere VLAN's?",
+a:[
+"Access",
+"Trunk",
+"Console",
+"USB"
+],
+c:1,
+f:"✅ Correct! Een trunk vervoert meerdere VLAN's tegelijk."
+},
+
+{
+q:"Waarom hebben VLAN's Inter-VLAN Routing nodig?",
+a:[
+"Omdat VLAN's aparte netwerken zijn",
+"Omdat er DHCP nodig is",
+"Omdat switches te langzaam zijn",
+"Omdat er meer IP-adressen nodig zijn"
+],
+c:0,
+f:"✅ Correct! Elk VLAN is een apart netwerk."
+}
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+function renderQuestion(){
+
+const q = questions[currentQuestion];
+
+document.getElementById("counter")
+.innerHTML =
+`Vraag ${currentQuestion+1}
+van ${questions.length}`;
+
+let html =
+`<h2>${q.q}</h2>`;
+
+q.a.forEach((answer,index)=>{
+
+html += `
+<div class="answer"
+onclick="checkAnswer(${index})">
+${answer}
+</div>
+`;
+
+});
+
+document.getElementById("quiz").innerHTML =
+html;
+
+document.getElementById("nextBtn")
+.style.display="none";
+
+updateProgress();
+
+}
+
+function checkAnswer(index){
+
+const q = questions[currentQuestion];
+
+const answers =
+document.querySelectorAll(".answer");
+
+answers.forEach(a=>{
+a.style.pointerEvents="none";
+});
+
+if(index===q.c){
+
+score++;
+
+answers[index]
+.classList.add("correct");
+
+}else{
+
+answers[index]
+.classList.add("wrong");
+
+answers[q.c]
+.classList.add("correct");
+
+}
+
+document.getElementById("quiz")
+.innerHTML +=
+
+`<div class="feedback">
+${q.f}
+</div>`;
+
+document.getElementById("nextBtn")
+.style.display="inline-block";
+
+}
+
+function nextQuestion(){
+
+currentQuestion++;
+
+if(currentQuestion <
+questions.length){
+
+renderQuestion();
+
+}else{
+
+showResult();
+
+}
+
+}
+
+function updateProgress(){
+
+let percentage =
+(currentQuestion /
+questions.length) * 100;
+
+document
+.getElementById("progressFill")
+.style.width =
+percentage + "%";
+
+}
+
+function showResult(){
+
+document
+.getElementById("progressFill")
+.style.width = "100%";
+
+let level = "";
+
+if(score >= 9){
+
+level="🏆 Cisco Expert";
+
+}
+else if(score >= 7){
+
+level="✅ Netwerkbeheerder";
+
+}
+else if(score >= 5){
+
+level="⚡ Junior Engineer";
+
+}
+else{
+
+level="📚 Nog oefenen";
+
+}
+
+document
+.getElementById("quiz")
+.innerHTML =
+
+`
+<h2>🎉 Quiz voltooid!</h2>
+
+<h3>Score: ${score}/${questions.length}</h3>
+
+<p>${level}</p>
+`;
+
+document
+.getElementById("nextBtn")
+.style.display="none";
+
+document
+.getElementById("counter")
+.innerHTML = "";
+
+}
+
+renderQuestion();
+
+</script>
+
+</body>
+</html>
