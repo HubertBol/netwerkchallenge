@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Netwerkinfrastructuur Challenge</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+}
+
+header{
+    background:#2563eb;
+    text-align:center;
+    padding:40px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:12px;
+    margin-bottom:20px;
+}
+
+.answer{
+    background:#334155;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.answer:hover{
+    background:#475569;
+}
+
+.correct{
+    background:#16a34a !important;
+}
+
+.wrong{
+    background:#dc2626 !important;
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#1d4ed8;
+}
+
+#nextBtn{
+    display:none;
+}
+
+.progress{
+    height:20px;
+    background:#334155;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progressbar{
+    height:100%;
+    width:0%;
+    background:#16a34a;
+    transition:0.5s;
+}
+
+.feedback{
+    margin-top:15px;
+    padding:12px;
+    border-radius:8px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>💻 Netwerkinfrastructuur Challenge</h1>
+<p>TCP/IP • Subnetting • VLAN's • Inter-VLAN Routing</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Voortgang</h2>
+
+<div class="progress">
+<div id="bar" class="progressbar"></div>
+</div>
+
+<p id="counter"></p>
+
+</div>
+
+<div class="card">
+
+<div id="quiz"></div>
+
+<button id="nextBtn" onclick="nextQuestion()">
+Volgende vraag →
+</button>
+
+<div id="result"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"Hoeveel bruikbare hosts heeft een /26 subnet?",
+answers:["30","62","126","254"],
+correct:1,
+feedback:[
+"Niet correct. Dit hoort bij een /27 subnet.",
+"✅ Correct! Een /26 bevat 64 adressen waarvan 2 gereserveerd zijn.",
+"Niet correct. Dit hoort bij een /25 subnet.",
+"Niet correct. Dit hoort bij een /24 subnet."
+]
+},
+
+{
+question:"Wat doet een VLAN?",
+answers:[
+"Meer snelheid",
+"Logische netwerkscheiding",
+"Meer geheugen",
+"DNS vervangen"
+],
+correct:1,
+feedback:[
+"Niet correct.",
+"✅ Correct! VLAN's verdelen een netwerk logisch in aparte segmenten.",
+"Niet correct.",
+"Niet correct."
+]
+},
+
+{
+question:"Waarvoor gebruik je een default gateway?",
+answers:[
+"Naar andere netwerken gaan",
+"Printer delen",
+"DNS vervangen",
+"WiFi verbeteren"
+],
+correct:0,
+feedback:[
+"✅ Correct! De gateway is de uitgang naar andere netwerken.",
+"Niet correct.",
+"Niet correct.",
+"Niet correct."
+]
+}
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+function updateProgress() {
+
+const percentage =
+((currentQuestion) / questions.length) * 100;
+
+document.getElementById("bar").style.width =
+percentage + "%";
+
+}
+
+function renderQuestion() {
+
+const q = questions[currentQuestion];
+
+document.getElementById("counter").innerHTML =
+"Vraag " +
+(currentQuestion + 1) +
+" van " +
+questions.length;
+
+let html =
+"<h2>" + q.question + "</h2>";
+
+for(let i=0;i<q.answers.length;i++){
+
+html +=
+'<div class="answer" onclick="checkAnswer(' +
+i +
+')">' +
+q.answers[i] +
+'</div>';
+
+}
+
+document.getElementById("quiz").innerHTML =
+html;
+
+document.getElementById("nextBtn").style.display =
+"none";
+
+}
+
+function checkAnswer(index){
+
+const q = questions[currentQuestion];
+
+const answers =
+document.querySelectorAll(".answer");
+
+answers.forEach(function(a){
+a.style.pointerEvents = "none";
+});
+
+const feedback =
+document.createElement("div");
+
+feedback.className = "feedback";
+
+if(index === q.correct){
+
+answers[index].classList.add("correct");
+
+feedback.style.background="#14532d";
+
+score++;
+
+}else{
+
+answers[index].classList.add("wrong");
+
+answers[q.correct].classList.add("correct");
+
+feedback.style.background="#7f1d1d";
+
+}
+
+feedback.innerHTML =
+q.feedback[index];
+
+document
+.getElementById("quiz")
+.appendChild(feedback);
+
+document.getElementById("nextBtn")
+.style.display = "inline-block";
+
+}
+
+function nextQuestion(){
+
+currentQuestion++;
+
+updateProgress();
+
+if(currentQuestion < questions.length){
+
+renderQuestion();
+
+}else{
+
+showResult();
+
+}
+
+}
+
+function showResult(){
+
+document.getElementById("bar").style.width =
+"100%";
+
+let niveau;
+
+if(score === questions.length){
+
+niveau = "🏆 Expert";
+
+}else if(score >= 2){
+
+niveau = "✅ Gevorderd";
+
+}else{
+
+niveau = "📚 Nog oefenen";
+
+}
+
+document.getElementById("quiz").innerHTML = "";
+
+document.getElementById("nextBtn").style.display =
+"none";
+
+document.getElementById("counter").innerHTML =
+"Quiz voltooid";
+
+document.getElementById("result").innerHTML =
+"<h2>Score: " +
+score +
+" van " +
+questions.length +
+"</h2><p>" +
+niveau +
+"</p>";
+
+}
+
+renderQuestion();
+
+</script>
+
+</body>
+</html>
